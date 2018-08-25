@@ -26,5 +26,6 @@ repositories {
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter')
+	compile('io.reactivex:rxjava:1.1.9')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
