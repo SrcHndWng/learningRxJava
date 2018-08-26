@@ -5,8 +5,8 @@ import io.reactivex.Flowable;
 import io.reactivex.FlowableEmitter;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subscribers.ResourceSubscriber;
 import org.reactivestreams.Subscriber;
-import org.reactivestreams.Subscription;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -50,31 +50,43 @@ public class Application {
                 BackpressureStrategy.BUFFER); // 超過したデータはバッファする
     }
 
-    private Subscriber<String> createSubscriber() {
-        return new Subscriber<String>() {
-
-            /** データ数のリクエストおよび購読の解除を行うオブジェクト */
-            private Subscription subscription;
+    private ResourceSubscriber<String> createSubscriber() {
+        return new ResourceSubscriber<String>() {
+            /** 購読の開始時間 */
+            private long startTime;
 
             // 購読が開始された際の処理
             @Override
-            public void onSubscribe(Subscription subscription) {
-                // SubscriptionをSubscriber内で保持する
-                this.subscription = subscription;
-                // 受け取るデータ数をリクエストする
-                this.subscription.request(1L);
+            protected void onStart() {
+                // 購読の開始時間を取得
+                startTime = System.currentTimeMillis();
+                // データ数のリクエスト
+                request(Long.MAX_VALUE);
             }
 
             // データを受け取った際の処理
             @Override
-            public void onNext(String item) {
-                // 実行しているスレッド名の取得
+            public void onNext(String data) {
+                // 購読開始から500ミリ秒を過ぎた場合は購読を解除する
+                if ((System.currentTimeMillis() - startTime) > 500L) {
+                    dispose(); //  購読を解除する
+                    System.out.println("購読解除しました");
+                    return;
+                }
+
+                // 重い処理をしているとみなして1000ミリ秒待機
+                // ※ 本来はThread.sleepは呼ぶべきではない
+                try {
+                    Thread.sleep(1000L);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+
+                // 実行しているThread名の取得
                 String threadName = Thread.currentThread().getName();
                 // 受け取ったデータを出力する
-                System.out.println(threadName + ": " + item);
-
-                // 次に受け取るデータ数をリクエストする
-                this.subscription.request(1L);
+                System.out.println(threadName + ": " + data);
             }
 
             // 完了を通知された際の処理
@@ -98,7 +110,7 @@ public class Application {
         Flowable<String> flowable = crateFlowable();
 
         // Subscriberを生成する
-        Subscriber<String> subscriber = createSubscriber();
+        ResourceSubscriber<String> subscriber = createSubscriber();
 
         flowable
                 // Subscriberの処理を別スレッドで行うようにする
@@ -107,6 +119,6 @@ public class Application {
                 .subscribe(subscriber);
 
         // しばらく待つ
-        Thread.sleep(500L);
+        Thread.sleep(1500L);
     }
 }
