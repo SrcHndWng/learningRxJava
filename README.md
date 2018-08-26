@@ -21,6 +21,6 @@ Githubの各Tagで、それぞれいかを実装している。
 
     [簡単なサンプルを作って学ぶRxJava（1.x）](https://codezine.jp/article/detail/9650) の各プログラム
 
-* v2.1.x
+* v2.0.x
 
     [RxJava 2.xを用いた簡単なサンプルプログラムの実装](https://codezine.jp/article/detail/9745) の各プログラム
