@@ -27,3 +27,5 @@ gradle/
 /dist/
 /nbdist/
 /.nb-gradle/
+
+MEMO.md
