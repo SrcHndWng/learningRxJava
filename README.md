@@ -2,7 +2,7 @@
 
 ## About This
 
-https://codezine.jp/article/detail/9650
+https://codezine.jp/article/detail/9745
 
 こちらの記事を学習のために写経したもの。
 
