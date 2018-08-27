@@ -1,6 +1,9 @@
 package com.example.learningRxJava;
 
 import io.reactivex.Flowable;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.concurrent.TimeUnit;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -19,16 +22,32 @@ public class Application {
     }
 
     private void run() throws Exception {
-        Flowable<Integer> result =
-                Flowable
-                        // 引数のデータを通知するFlowableを生成
-                        .just(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-                        // 偶数のデータのみを通知する
-                        .filter(data -> data % 2 == 0)
-                        // 通知するデータを10倍にする
-                        .map(data -> data * 10);
+        // 「分:秒.ミリ秒」の文字列に変換するFormatter
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("mm:ss.SSS");
 
-        // 購読する
-        result.subscribe(data -> System.out.println("received = " + data));
+        // 処理を開始する前の時間
+        System.out.println("開始時間: " + LocalTime.now().format(formatter));
+
+        // 1000ミリ秒後に数値「0」を通知するFlowableの生成
+        Flowable<Long> flowable = Flowable.timer(1000L, TimeUnit.MILLISECONDS); // ①
+
+        // 購読開始
+        flowable.subscribe(
+                // 第1引数： データの通知時
+                data -> { // ②
+                    // Thread名の取得
+                    String threadName = Thread.currentThread().getName();
+                    // 現在時刻の「分:秒.ミリ秒」を取得
+                    String time = LocalTime.now().format(formatter);
+                    // 出力
+                    System.out.println(threadName + ": " + time + ": data=" + data);
+                },
+                // 第2引数： エラーの通知時
+                error -> System.out.println("エラー=" + error),
+                // 第3引数： 完了の通知時
+                () -> System.out.println("完了")); // ③
+
+        // しばらく待つ
+        Thread.sleep(1500L);
     }
 }
