@@ -15,7 +15,7 @@ Spring Bootに組み込む形で実装。
 
 ## Tagについて
 
-Githubの各Tagで、それぞれいかを実装している。
+Githubの各Tagで、それぞれ以下を実装している。
 
 * v1.x
 
@@ -24,3 +24,7 @@ Githubの各Tagで、それぞれいかを実装している。
 * v2.0.x
 
     [RxJava 2.xを用いた簡単なサンプルプログラムの実装](https://codezine.jp/article/detail/9745) の各プログラム
+
+* v2.1.x
+
+    [RxJava（2.x）の最初に知っておいてもらいたいオペレータ](https://codezine.jp/article/detail/9879) の各プログラム
